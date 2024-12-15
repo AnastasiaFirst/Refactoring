@@ -1,0 +1,52 @@
+import java.io.BufferedReader;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Request {
+    private final String method;
+    private final String path;
+    private final Map<String, String> queryParams;
+    private final BufferedReader body;
+
+    public Request(String method, String path, BufferedReader body) {
+        this.method = method;
+        this.path = path.split("\\?")[0]; // Убираем Query String
+        this.queryParams = parseQueryParams(path);
+        this.body = body;
+    }
+
+    private Map<String, String> parseQueryParams(String path) {
+        Map<String, String> params = new HashMap<>();
+        String[] parts = path.split("\\?");
+        if (parts.length > 1) {
+            String[] queryParams = parts[1].split("&");
+            for (String param : queryParams) {
+                String[] keyValue = param.split("=");
+                if (keyValue.length == 2) {
+                    params.put(keyValue[0], keyValue[1]);
+                }
+            }
+        }
+        return params;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getQueryParam(String name) {
+        return queryParams.get(name);
+    }
+
+    public Map<String, String> getQueryParams() {
+        return queryParams;
+    }
+
+    public BufferedReader getBody() {
+        return body;
+    }
+}
