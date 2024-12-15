@@ -1,15 +1,45 @@
-import java.util.List;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        final var validPaths = List.of(
-                "/index.html", "/spring.svg", "/spring.png",
-                "/resources.html", "/styles.css", "/app.js",
-                "/links.html", "/forms.html", "/classic.html",
-                "/events.html", "/events.js"
-        );
+        final var server = new Server(64);
 
-        final var server = new Server(9999, 64, validPaths);
-        server.start();
+        server.addHandler("GET", "/messages", new Handler() {
+            public void handle(Request request, BufferedOutputStream responseStream) {
+                try {
+                    String responseBody = "GET messages response";
+                    responseStream.write(("HTTP/1.1 200 OK\r\n" +
+                            "Content-Type: text/plain\r\n" +
+                            "Content-Length: " + responseBody.length() + "\r\n" +
+                            "Connection: close\r\n" +
+                            "\r\n").getBytes());
+                    responseStream.write(responseBody.getBytes());
+                    responseStream.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        server.addHandler("POST", "/messages", new Handler() {
+            public void handle(Request request, BufferedOutputStream responseStream) {
+
+                try {
+                    String responseBody = "POST messages response";
+                    responseStream.write(("HTTP/1.1 200 OK\r\n" +
+                            "Content-Type: text/plain\r\n" +
+                            "Content-Length: " + responseBody.length() + "\r\n" +
+                            "Connection: close\r\n" +
+                            "\r\n").getBytes());
+                    responseStream.write(responseBody.getBytes());
+                    responseStream.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        server.listen(9999);
     }
 }
